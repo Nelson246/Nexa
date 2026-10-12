@@ -1,0 +1,14 @@
+﻿.env
+.env.*
+!.env.example
+node_modules/
+android/
+www/
+server.js.backup
+test-email.js
+capacitor.config.json
+npm-debug.log*
+.DS_Store
+Thumbs.db
+public/uploads/*.backup
+*.backup

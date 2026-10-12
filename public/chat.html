@@ -1,0 +1,3554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NEXA — Connect. Chat. Share.</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1769ff;
+            --primary-dark: #0754db;
+            --page-bg: #edf2f8;
+            --surface: #ffffff;
+            --text: #172337;
+            --muted: #7b879a;
+            --border: #e5eaf2;
+            --received: #f0f3f8;
+            --sent: #1769ff;
+            --success: #18a875;
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            overflow: hidden;
+            font-family: Inter, Arial, sans-serif;
+            color: var(--text);
+            background: var(--page-bg);
+        }
+
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: .55;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 320px minmax(0, 1fr);
+            width: 100%;
+            height: 100dvh;
+            max-width: 1700px;
+            margin: 0 auto;
+            overflow: hidden;
+            background: var(--surface);
+            box-shadow: 0 0 40px #1723370a;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            border-right: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 22px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-logo {
+            display: grid;
+            place-items: center;
+            width: 45px;
+            height: 45px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            color: white;
+            background: linear-gradient(135deg, #5595ff, #0754db);
+            font-size: 25px;
+            font-weight: 800;
+            box-shadow: 0 5px 15px #1769ff25;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .brand p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .search-area {
+            padding: 18px 15px 12px;
+        }
+
+        .search-wrap {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            left: 14px;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 20px;
+            pointer-events: none;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            height: 46px;
+            padding: 0 13px 0 42px;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            outline: none;
+            background: #f5f7fb;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .search-wrap input:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .list-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 19px;
+        }
+
+        .list-heading h2 {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .list-heading span {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .conversation-list {
+            flex: 1;
+            min-height: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 0 9px 12px;
+        }
+
+        .conversation-item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            min-width: 0;
+            padding: 12px 10px;
+            margin-bottom: 3px;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .conversation-item:hover {
+            background: #f4f7fc;
+        }
+
+        .conversation-item.active {
+            background: #edf4ff;
+        }
+
+        .avatar {
+            display: grid;
+            place-items: center;
+            position: relative;
+            width: 45px;
+            height: 45px;
+            flex: 0 0 45px;
+            overflow: hidden;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #80aaff, #466ce2);
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .avatar img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .conversation-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .conversation-info h3 {
+            margin: 0 0 5px;
+            overflow: hidden;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .conversation-info p {
+            margin: 0;
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 11px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* NEXA contact online status */
+.contact-presence {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 4px 0 !important;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.presence-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: #9ca3af;
+}
+
+.contact-presence.online {
+    color: #18a875;
+}
+
+.contact-presence.online .presence-dot {
+    background: #18a875;
+}
+
+.contact-presence.offline .presence-dot {
+    background: #9ca3af;
+}
+
+#chatStatus.online {
+    color: #18a875;
+}
+
+#chatStatus.offline {
+    color: var(--muted);
+}
+
+
+        .empty-list {
+            padding: 25px 14px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .sidebar-footer .avatar {
+            width: 39px;
+            height: 39px;
+            flex-basis: 39px;
+        }
+
+        .my-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .my-info strong {
+            display: block;
+            overflow: hidden;
+            font-size: 12px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .my-info span {
+            display: block;
+            margin-top: 4px;
+            color: var(--success);
+            font-size: 10px;
+        }
+
+        .icon-button {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border: 0;
+            border-radius: 11px;
+            background: transparent;
+            color: var(--muted);
+            font-size: 20px;
+        }
+
+        .icon-button:hover {
+            background: #f0f4fa;
+            color: var(--primary);
+        }
+
+        /* MAIN CHAT */
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            height: 100%;
+            overflow: hidden;
+            background: var(--surface);
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 78px;
+            flex-shrink: 0;
+            padding: 13px 22px;
+            border-bottom: 1px solid var(--border);
+            background: white;
+        }
+
+        .chat-header .avatar {
+            width: 44px;
+            height: 44px;
+            flex-basis: 44px;
+        }
+
+        .chat-person {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-person h2 {
+            margin: 0 0 5px;
+            overflow: hidden;
+            font-size: 14px;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chat-person p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* MESSAGE AREA */
+
+        .messages {
+            display: flex;
+            flex: 1 1 0;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 13px;
+            min-width: 0;
+            min-height: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 24px;
+            background:
+                radial-gradient(circle at 15% 15%, #edf4ff 0, transparent 30%),
+                #ffffff;
+            overscroll-behavior: contain;
+        }
+
+        .welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            min-height: 250px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .welcome-logo {
+            display: grid;
+            place-items: center;
+            width: 76px;
+            height: 76px;
+            margin-bottom: 20px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #5595ff, #0754db);
+            box-shadow: 0 12px 28px #1769ff25;
+            color: white;
+            font-size: 38px;
+            font-weight: 800;
+        }
+
+        .welcome h2 {
+            margin: 0 0 10px;
+            color: var(--text);
+            font-size: 22px;
+        }
+
+        .welcome p {
+            max-width: 330px;
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.9;
+        }
+
+        /*
+         * Messages are direct children of .messages.
+         * Received messages align LEFT.
+         * Messages sent by the logged-in user align RIGHT.
+         */
+
+
+        /* MESSAGE COMPOSER */
+
+        .composer {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: flex-end;
+            gap: 10px;
+            min-width: 0;
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            background: white;
+        }
+            
+/* Chat message container */
+.messages {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+/* Received messages: left side */
+.message {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+    align-items: flex-start;
+    width: fit-content;
+    max-width: min(75%, 560px);
+    min-width: 0;
+    margin-right: auto;
+    margin-left: 0;
+    gap: 4px;
+}
+
+/* Sent messages: right side */
+.message.mine {
+    align-self: flex-end;
+    align-items: flex-end;
+    margin-right: 0;
+    margin-left: auto;
+}
+
+/* Message bubbles */
+.message-bubble {
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #222222;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+}
+
+/* Green bubbles for your messages */
+.message.mine .message-bubble {
+    background: #d9fdd3;
+    color: #111b21;
+    border-radius: 10px 10px 2px 10px;
+}
+
+/* Bubble shape for received messages */
+.message:not(.mine) .message-bubble {
+    border-radius: 10px 10px 10px 2px;
+}
+
+/* Message timestamps */
+.message-time {
+    font-size: 11px;
+    color: #667781;
+    padding: 0 3px;
+}
+
+
+.message-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    padding: 0 3px;
+    font-size: 11px;
+    color: #667781;
+}
+
+.message-status {
+    color: #53a6d8;
+    font-size: 12px;
+    letter-spacing: -3px;
+    padding-right: 3px;
+}
+
+
+
+
+
+        .composer textarea {
+            display: block;
+            flex: 1 1 auto;
+            width: 0;
+            min-width: 0;
+            height: 45px;
+            min-height: 45px;
+            max-height: 120px;
+            padding: 13px 15px;
+            resize: none;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            outline: none;
+            background: #f5f7fb;
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .composer textarea:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .send-button {
+            display: grid;
+            place-items: center;
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+            border: 0;
+            border-radius: 14px;
+            background: var(--primary);
+            color: white;
+            font-size: 21px;
+            transition: background .15s;
+        }
+
+        .send-button:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+
+        .composer-hint {
+            flex: 0 0 auto;
+            padding: 0 22px 9px;
+            background: white;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        /* TOAST */
+
+        .toast {
+            position: fixed;
+            z-index: 100;
+            right: 20px;
+            bottom: 20px;
+            display: none;
+            max-width: calc(100% - 40px);
+            padding: 13px 17px;
+            border-radius: 12px;
+            background: #172337;
+            box-shadow: 0 8px 25px #0002;
+            color: white;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .back-button {
+            display: none;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 760px) {
+            .app {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .sidebar,
+            .main {
+                grid-column: 1;
+                grid-row: 1;
+                width: 100%;
+                height: 100%;
+                height: 100dvh;
+                min-height: 0;
+            }
+
+            .main {
+                display: none;
+            }
+
+            .app.chat-open .sidebar {
+                display: none;
+            }
+
+            .app.chat-open .main {
+                display: flex;
+            }
+
+            .back-button {
+                display: grid;
+            }
+
+            .brand {
+                padding: 15px 16px;
+            }
+
+            .search-area {
+                padding: 13px 13px 9px;
+            }
+
+            .list-heading {
+                padding: 12px 17px;
+            }
+
+            .chat-header {
+                gap: 8px;
+                min-height: 68px;
+                padding: 9px 10px;
+            }
+
+            .chat-header .avatar {
+                width: 39px;
+                height: 39px;
+                flex-basis: 39px;
+            }
+
+            .chat-person h2 {
+                font-size: 13px;
+            }
+
+            .header-actions .icon-button {
+                width: 32px;
+                height: 36px;
+            }
+
+            .messages {
+                padding: 17px 12px;
+                gap: 12px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            .message-bubble {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            .composer {
+                gap: 8px;
+                padding: 10px;
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
+
+            .composer textarea {
+                height: 44px;
+                min-height: 44px;
+                padding: 12px;
+                font-size: 13px;
+            }
+
+            .send-button {
+                width: 44px;
+                height: 44px;
+                flex-basis: 44px;
+            }
+
+            .composer-hint {
+                padding: 0 13px 7px;
+                font-size: 9px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header-actions .icon-button {
+                width: 28px;
+            }
+
+            .chat-header {
+                gap: 5px;
+            }
+
+            .messages {
+                padding-right: 9px;
+                padding-left: 9px;
+            }
+        }
+
+        /* Conversation name and unread message count */
+.conversation-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+}
+
+.conversation-name-row h3 {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.unread-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    border-radius: 999px;
+    background: #25d366;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* NEXA Voice Recorder — Refined Design */
+
+.wa-voice-recorder {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 18px;
+    background: #ffffff;
+    border-top: 1px solid #e8edf3;
+    box-shadow: 0 -3px 12px rgba(15, 23, 42, 0.04);
+}
+
+.wa-voice-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.wa-voice-icon:hover {
+    transform: scale(1.06);
+}
+
+.wa-cancel-recording {
+    background: #fff0f0;
+    color: #d93025;
+}
+
+.wa-cancel-recording:hover {
+    background: #ffe2e2;
+}
+
+.wa-stop-recording {
+    background: #f0f3f7;
+    color: #253247;
+}
+
+.wa-stop-recording:hover {
+    background: #e2e8f0;
+}
+
+.wa-send-recording {
+    background: #1769ff;
+    color: #ffffff;
+    box-shadow: 0 3px 9px rgba(23, 105, 255, 0.22);
+}
+
+.wa-send-recording:hover {
+    background: #0758e8;
+}
+
+.wa-send-recording:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.wa-voice-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 7px;
+}
+
+.wa-voice-live {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.wa-recording-dot {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 9px;
+    border-radius: 50%;
+    background: #ef4444;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.10);
+    animation: waRecordingPulse 1.2s ease-in-out infinite;
+}
+
+.wa-voice-waveform {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3px;
+    width: 100%;
+    height: 30px;
+    overflow: hidden;
+}
+
+.wa-wave-bar {
+    display: block;
+    flex: 1 1 3px;
+    max-width: 4px;
+    min-width: 2px;
+    border-radius: 5px;
+    background: #20b866;
+    animation: waWavePulse 0.7s ease-in-out infinite alternate;
+    transform-origin: center;
+}
+
+#waVoicePreviewPlayer {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    height: 36px;
+    accent-color: #1769ff;
+}
+
+@keyframes waRecordingPulse {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.10);
+    }
+
+    50% {
+        opacity: 0.55;
+        box-shadow: 0 0 0 7px rgba(239, 68, 68, 0.04);
+    }
+}
+
+@keyframes waWavePulse {
+    from {
+        transform: scaleY(0.35);
+        opacity: 0.65;
+    }
+
+    to {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 760px) {
+    .wa-voice-recorder {
+        gap: 9px;
+        padding: 10px 12px;
+    }
+
+    .wa-voice-icon {
+        flex-basis: 40px;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .wa-voice-content {
+        gap: 5px;
+    }
+
+    .wa-voice-waveform {
+        height: 25px;
+    }
+
+    #waVoicePreviewPlayer {
+        height: 32px;
+    }
+}
+
+/* NEXA typing indicator */
+.typing-indicator {
+    margin: 5px 0 0;
+    color: #1769ff;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.typing-indicator[hidden] {
+    display: none;
+}
+
+
+    </style>
+</head>
+
+<body>
+<div class="app" id="app">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">N</div>
+            <div>
+                <h1>NEXA</h1>
+                <p>Connect. Chat. Share.</p>
+            </div>
+        </div>
+
+        <div class="search-area">
+            <div class="search-wrap">
+                <span class="search-icon">⌕</span>
+                <input
+                    id="searchInput"
+                    type="search"
+                    placeholder="Search people..."
+                    autocomplete="off"
+                >
+            </div>
+        </div>
+
+        <div class="list-heading">
+            <h2 id="listHeading">Messages</h2>
+            <span id="listCount">0 chats</span>
+        </div>
+
+        <div class="conversation-list" id="conversationList">
+            <div class="empty-list">Loading conversations...</div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="avatar" id="myAvatar">N</div>
+
+            <div class="my-info">
+                <strong id="myName">NEXA User</strong>
+                <span id="myUsername">@user</span>
+            </div>
+
+            <button
+                class="icon-button"
+                id="logoutButton"
+                title="Log out"
+                aria-label="Log out"
+            >⇥</button>
+        </div>
+
+    </aside>
+
+    <main class="main">
+
+        <header class="chat-header">
+
+            <button
+                class="icon-button back-button"
+                id="backButton"
+                aria-label="Back to conversations"
+            >←</button>
+
+            <div class="avatar" id="chatAvatar">N</div>
+
+            <div class="chat-person">
+                <h2 id="chatName">Welcome to NEXA</h2>
+                <p id="chatStatus">Select a conversation to begin</p>
+            </div>
+            <p
+    id="typingIndicator"
+    class="typing-indicator"
+    aria-live="polite"
+    hidden
+></p>
+
+<div class="header-actions">
+
+<button
+    class="icon-button"
+    id="voiceCallButton"
+    title="Start voice call"
+    aria-label="Start voice call"
+    disabled
+>📞</button>
+
+<button
+    class="icon-button"
+    id="videoCallButton"
+    title="Start video call"
+    aria-label="Start video call"
+    disabled
+>🎥</button>
+
+<button
+    class="icon-button"
+    id="refreshButton"
+    title="Refresh conversations"
+    aria-label="Refresh conversations"
+>↻</button>
+
+</div>
+
+
+
+        </header>
+
+        <section class="messages" id="messages">
+            <div class="welcome">
+                <div class="welcome-logo">N</div>
+                <h2>Your conversations, connected.</h2>
+                <p>
+                    Search for people, start a conversation, and
+                    exchange messages with NEXA.
+                </p>
+            </div>
+        </section>
+
+        <!-- NEXA WHATSAPP-STYLE VOICE RECORDER -->
+
+<div id="whatsappVoiceRecorder" class="wa-voice-recorder" style="display:none;">
+
+<button
+    type="button"
+    id="cancelVoiceRecording"
+    class="wa-voice-icon wa-cancel-recording"
+    aria-label="Cancel voice recording"
+    title="Cancel recording"
+>🗑</button>
+
+<div class="wa-voice-content">
+
+    <div class="wa-voice-live">
+        <span class="wa-recording-dot"></span>
+        <span id="waVoiceTimer">00:00</span>
+    </div>
+
+    <div id="waVoiceWaveform" class="wa-voice-waveform" aria-label="Recording waveform"></div>
+
+    <audio id="waVoicePreviewPlayer" controls style="display:none;width:100%;"></audio>
+
+</div>
+
+<button
+    type="button"
+    id="stopVoiceRecording"
+    class="wa-voice-icon wa-stop-recording"
+    aria-label="Stop recording"
+    title="Finish recording"
+>■</button>
+
+<button
+    type="button"
+    id="sendVoiceRecording"
+    class="wa-voice-icon wa-send-recording"
+    aria-label="Send voice note"
+    title="Send voice note"
+    style="display:none;"
+>➤</button>
+```
+
+</div>
+<!-- END NEXA VOICE RECORDER -->
+
+
+        <form class="composer" id="messageForm">
+
+    <!-- Select a picture or video -->
+    <button
+        type="button"
+        id="attachButton"
+        class="send-button"
+        aria-label="Attach a picture or video"
+        title="Send a picture or video"
+        disabled
+        style="background:#eef2ff;color:#4f46e5;"
+    >📎</button>
+
+    <!-- Hidden media selector -->
+    <input
+        type="file"
+        id="mediaInput"
+        accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm,video/quicktime"
+        hidden
+    >
+
+<!-- Message input -->
+<textarea
+    id="messageInput"
+    placeholder="Write a message..."
+    maxlength="5000"
+    rows="1"
+    aria-label="Message"
+    disabled
+></textarea>
+
+<!-- Voice note button -->
+<button
+    type="button"
+    class="send-button"
+    id="voiceNoteButton"
+    aria-label="Record voice note"
+    title="Record voice note"
+    disabled
+>🎤</button>
+
+<!-- Send text message -->
+<button
+    type="submit"
+    class="send-button"
+    id="sendButton"
+    aria-label="Send message"
+    disabled
+>➤</button>
+
+</form>
+
+        <div class="composer-hint">
+            Enter to send · Shift + Enter for a new line
+        </div>
+
+    </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+
+<!-- NEXA LIVE VOICE RECORDING INDICATOR -->
+<div
+    id="voiceRecordingIndicator"
+    style="
+        display:none;
+        position:fixed;
+        z-index:9998;
+        left:50%;
+        bottom:85px;
+        transform:translateX(-50%);
+        width:calc(100% - 32px);
+        max-width:420px;
+        padding:15px 18px;
+        border-radius:16px;
+        background:#172337;
+        color:white;
+        box-shadow:0 8px 30px rgba(0,0,0,0.2);
+        align-items:center;
+        gap:12px;
+    "
+>
+    <span
+        style="
+            width:11px;
+            height:11px;
+            flex-shrink:0;
+            border-radius:50%;
+            background:#ff3b30;
+            animation:nexaRecordingPulse 1s infinite;
+        "
+    ></span>
+
+    <div style="flex:1;min-width:0;">
+        <strong style="display:block;font-size:13px;">
+            Recording voice note
+        </strong>
+
+        <span
+            id="voiceRecordingTimer"
+            style="display:block;margin-top:5px;font-size:12px;color:#dbe4f0;"
+        >00:00</span>
+    </div>
+
+    <span style="font-size:12px;color:#cbd5e1;">
+        Press ⏹ to stop
+    </span>
+</div>
+
+<style>
+@keyframes nexaRecordingPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.35;
+        transform: scale(0.8);
+    }
+}
+</style>
+
+<!-- NEXA VOICE AND VIDEO CALL WINDOW -->
+
+<div id="callOverlay" style="display:none; position:fixed; inset:0; z-index:9999; background:#0f172a; color:white; align-items:center; justify-content:center; flex-direction:column; padding:20px; box-sizing:border-box;">
+
+<h2 id="callTitle">NEXA Call</h2>
+<p id="callStatus">Connecting...</p>
+
+<div id="remoteVideoContainer" style="display:none; width:100%; max-width:800px; flex:1; min-height:0;">
+    <video id="remoteVideo" autoplay playsinline style="width:100%; height:100%; object-fit:contain; border-radius:12px;"></video>
+</div>
+
+<video id="localVideo" autoplay muted playsinline style="display:none; position:absolute; right:20px; bottom:100px; width:150px; max-height:200px; object-fit:cover; border-radius:12px; border:2px solid white;"></video>
+
+<div id="incomingCallActions" style="display:none; gap:12px; margin-top:20px;">
+    <button id="acceptCallButton" style="padding:14px 22px; border:0; border-radius:10px; background:#16a34a; color:white; font-size:16px;">Accept</button>
+    <button id="declineCallButton" style="padding:14px 22px; border:0; border-radius:10px; background:#dc2626; color:white; font-size:16px;">Decline</button>
+</div>
+
+<div id="activeCallActions" style="display:none; gap:12px; margin-top:24px; flex-wrap:wrap; justify-content:center;">
+    <button id="muteCallButton" style="padding:12px 18px; border:0; border-radius:10px; background:#334155; color:white;">🎙️ Mute</button>
+    <button id="cameraCallButton" style="padding:12px 18px; border:0; border-radius:10px; background:#334155; color:white;">📷 Camera</button>
+    <button id="endCallButton" style="padding:12px 18px; border:0; border-radius:10px; background:#dc2626; color:white;">🔴 End call</button>
+</div>
+
+</div>
+<!-- END NEXA CALL WINDOW -->
+
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+(() => {
+    'use strict';
+
+    const app = document.getElementById('app');
+    const conversationList = document.getElementById('conversationList');
+    const messagesContainer = document.getElementById('messages');
+    const searchInput = document.getElementById('searchInput');
+    const messageInput = document.getElementById('messageInput');
+    const messageForm = document.getElementById('messageForm');
+    const sendButton = document.getElementById('sendButton');
+    const toast = document.getElementById('toast');
+    const attachButton = document.getElementById('attachButton');
+const mediaInput = document.getElementById('mediaInput');
+const voiceNoteButton = document.getElementById('voiceNoteButton');
+const typingIndicator = document.getElementById('typingIndicator');
+
+let typingTimer = null;
+let remoteTypingTimer = null;
+let isTyping = false;
+
+
+function stopTyping() {
+    clearTimeout(typingTimer);
+
+    if (isTyping && socket && activeConversationId != null) {
+        socket.emit('typing:stop', {
+            conversationId: activeConversationId
+        });
+    }
+
+    isTyping = false;
+}
+
+
+// NEXA voice-note recording variables
+let mediaRecorder = null;
+let voiceChunks = [];
+let recordedVoiceBlob = null;
+let voicePreviewUrl = null;
+let voiceStream = null;
+let isRecordingVoice = false;
+
+let voiceRecordingStartedAt = null;
+let voiceRecordingTimerInterval = null;
+
+const voiceRecordingIndicator = document.getElementById('voiceRecordingIndicator');
+const voiceRecordingTimer = document.getElementById('voiceRecordingTimer');
+
+// WhatsApp-style voice recorder elements
+const whatsappVoiceRecorder = document.getElementById('whatsappVoiceRecorder');
+const cancelVoiceRecording = document.getElementById('cancelVoiceRecording');
+const stopVoiceRecording = document.getElementById('stopVoiceRecording');
+const sendVoiceRecording = document.getElementById('sendVoiceRecording');
+const waVoiceTimer = document.getElementById('waVoiceTimer');
+const waVoiceWaveform = document.getElementById('waVoiceWaveform');
+const waVoicePreviewPlayer = document.getElementById('waVoicePreviewPlayer');
+
+// Create animated waveform bars
+if (waVoiceWaveform && !waVoiceWaveform.children.length) {
+    for (let i = 0; i < 36; i++) {
+        const bar = document.createElement('span');
+        bar.className = 'wa-wave-bar';
+        bar.style.height = `${6 + Math.random() * 20}px`;
+        bar.style.animationDelay = `${Math.random() * 0.6}s`;
+        waVoiceWaveform.appendChild(bar);
+    }
+}
+
+let currentUser = null;
+let conversations = [];
+let activeConversationId = null;
+let activeOtherUser = null;
+let socket = null;
+
+// Stores the latest known presence for each contact.
+const presenceByUserId = new Map();
+    
+// Voice and video calling state
+let peerConnection = null;
+let localCallStream = null;
+let activeCall = null;
+let incomingCall = null;
+let pendingIceCandidates = [];
+let callType = null;
+let isCallInitiator = false;
+let callTimerInterval = null;
+let callStartedAt = null;
+
+// Calling interface elements
+const voiceCallButton = document.getElementById('voiceCallButton');
+const videoCallButton = document.getElementById('videoCallButton');
+
+const callOverlay = document.getElementById('callOverlay');
+const callTitle = document.getElementById('callTitle');
+const callStatus = document.getElementById('callStatus');
+
+const remoteVideo = document.getElementById('remoteVideo');
+const localVideo = document.getElementById('localVideo');
+const remoteVideoContainer = document.getElementById('remoteVideoContainer');
+
+const incomingCallActions = document.getElementById('incomingCallActions');
+const activeCallActions = document.getElementById('activeCallActions');
+
+const acceptCallButton = document.getElementById('acceptCallButton');
+const declineCallButton = document.getElementById('declineCallButton');
+const muteCallButton = document.getElementById('muteCallButton');
+const cameraCallButton = document.getElementById('cameraCallButton');
+const endCallButton = document.getElementById('endCallButton');
+
+
+
+    let searchTimer = null;
+    let toastTimer = null;
+
+    let knownMessageIds = new Set();
+    let openSequence = 0;
+    let conversationLoadSequence = 0;
+    let searchSequence = 0;
+
+    function getUserId(user) {
+        if (!user) return null;
+
+        return user.id
+            ?? user.userId
+            ?? user.user_id
+            ?? user.other_user_id
+            ?? null;
+    }
+
+    function getConversationId(conversation) {
+        if (!conversation) return null;
+
+        return conversation.conversation_id
+            ?? conversation.conversationId
+            ?? null;
+    }
+
+    function getSenderId(message) {
+        return message.sender_id
+            ?? message.senderId
+            ?? message.user_id
+            ?? message.sender?.id
+            ?? null;
+    }
+
+    async function api(url, options = {}) {
+        const response = await fetch(url, {
+            credentials: 'same-origin',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...(options.headers || {})
+            }
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (response.status === 401) {
+            window.location.href = '/login.html';
+            throw new Error('Please log in again.');
+        }
+
+        if (!response.ok || data.success === false) {
+            throw new Error(
+                data.message || 'The request could not be completed.'
+            );
+        }
+
+        return data;
+    }
+
+    function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+
+        clearTimeout(toastTimer);
+
+        toastTimer = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3500);
+    }
+
+    function getInitials(name) {
+        return String(name || 'N')
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map(part => part[0] || '')
+            .join('')
+            .toUpperCase() || 'N';
+    }
+
+    function createAvatar(element, user) {
+        element.replaceChildren();
+
+        if (user?.profile_picture) {
+            const image = document.createElement('img');
+
+            image.src = user.profile_picture;
+            image.alt = '';
+            image.onerror = () => {
+                image.remove();
+                element.textContent = getInitials(
+                    user.full_name || user.username
+                );
+            };
+
+            element.appendChild(image);
+            return;
+        }
+
+        element.textContent = getInitials(
+            user?.full_name || user?.username
+        );
+    }
+
+    function formatTime(value) {
+        if (!value) return '';
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) return '';
+
+        return date.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    async function loadCurrentUser() {
+        const data = await api('/api/auth/me');
+
+        currentUser = data.user;
+
+        if (!currentUser || getUserId(currentUser) == null) {
+            throw new Error(
+                'Your account ID could not be identified. Please log in again.'
+            );
+        }
+
+        document.getElementById('myName').textContent =
+            currentUser.full_name || currentUser.username || 'NEXA User';
+
+        document.getElementById('myUsername').textContent =
+            '@' + (currentUser.username || 'user');
+
+        createAvatar(
+            document.getElementById('myAvatar'),
+            currentUser
+        );
+    }
+
+    function renderConversations(items) {
+    conversationList.replaceChildren();
+
+    document.getElementById('listCount').textContent =
+        `${items.length} ${items.length === 1 ? 'chat' : 'chats'}`;
+
+    if (!items.length) {
+        const empty = document.createElement('div');
+
+        empty.className = 'empty-list';
+        empty.textContent = searchInput.value.trim()
+            ? 'No matching people found.'
+            : 'No conversations yet. Search for someone to start chatting.';
+
+        conversationList.appendChild(empty);
+        return;
+    }
+
+    for (const item of items) {
+        const row = document.createElement('div');
+        const conversationId = getConversationId(item);
+
+        const userId = Number(
+            item.other_user_id ?? item.user_id ?? item.id
+        );
+
+        row.className = 'conversation-item';
+
+        // Connect this contact's row to their user ID.
+        if (Number.isSafeInteger(userId) && userId > 0) {
+            row.dataset.userId = String(userId);
+        }
+
+        if (
+            conversationId != null &&
+            Number(conversationId) === Number(activeConversationId)
+        ) {
+            row.classList.add('active');
+        }
+
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        createAvatar(avatar, item);
+
+        const info = document.createElement('div');
+        info.className = 'conversation-info';
+
+        // Contact name and unread count.
+        const nameRow = document.createElement('div');
+        nameRow.className = 'conversation-name-row';
+
+        const name = document.createElement('h3');
+        name.textContent = item.full_name || item.username || 'User';
+
+        nameRow.appendChild(name);
+
+        const unreadCount = Number(item.unread_count) || 0;
+
+        if (unreadCount > 0) {
+            const badge = document.createElement('span');
+
+            badge.className = 'unread-badge';
+            badge.textContent = unreadCount > 99
+                ? '99+'
+                : String(unreadCount);
+
+            badge.setAttribute(
+                'aria-label',
+                `${unreadCount} unread ${
+                    unreadCount === 1 ? 'message' : 'messages'
+                }`
+            );
+
+            nameRow.appendChild(badge);
+        }
+
+        // Online status.
+        const presence = document.createElement('p');
+        presence.className = 'contact-presence offline';
+
+        const dot = document.createElement('span');
+        dot.className = 'presence-dot';
+
+        const statusText = document.createElement('span');
+
+        const presenceData = presenceByUserId.get(userId);
+
+        if (presenceData?.online) {
+            presence.classList.remove('offline');
+            presence.classList.add('online');
+            statusText.textContent = 'Online';
+        } else if (presenceData?.lastSeenAt) {
+            statusText.textContent =
+                formatLastSeen(presenceData.lastSeenAt);
+        } else {
+            statusText.textContent = 'Offline';
+        }
+
+        presence.append(dot, statusText);
+
+        // Keep the existing message preview.
+        const preview = document.createElement('p');
+
+        preview.textContent =
+            item.last_message || ('@' + (item.username || 'user'));
+
+        info.append(nameRow, presence, preview);
+        row.append(avatar, info);
+
+        row.addEventListener('click', () => {
+            if (conversationId != null) {
+                openConversation(item);
+            } else {
+                startConversation(item);
+            }
+        });
+
+        conversationList.appendChild(row);
+    }
+}
+
+
+    async function loadConversations() {
+        const sequence = ++conversationLoadSequence;
+
+        const data = await api('/api/chat/conversations');
+
+        if (sequence !== conversationLoadSequence) return;
+
+        conversations = data.conversations || [];
+
+        if (searchInput.value.trim().length >= 2) {
+            searchPeople(searchInput.value.trim());
+            return;
+        }
+
+        document.getElementById('listHeading').textContent = 'Messages';
+
+        renderConversations(conversations);
+    }
+
+    async function searchPeople(query) {
+        const sequence = ++searchSequence;
+
+        if (!query || query.length < 2) {
+            document.getElementById('listHeading').textContent = 'Messages';
+            renderConversations(conversations);
+            return;
+        }
+
+        try {
+            document.getElementById('listHeading').textContent = 'People';
+
+            const data = await api(
+                '/api/chat/users?q=' + encodeURIComponent(query)
+            );
+
+            if (
+                sequence !== searchSequence ||
+                searchInput.value.trim() !== query
+            ) {
+                return;
+            }
+
+            const existingByUser = new Map(
+                conversations.map(item => [
+                    Number(item.other_user_id),
+                    item
+                ])
+            );
+
+            const results = (data.users || []).map(user => {
+                return existingByUser.get(Number(user.id)) || {
+                    ...user,
+                    id: user.id,
+                    other_user_id: user.id,
+                    conversation_id: null,
+                    last_message: null
+                };
+            });
+
+            renderConversations(results);
+
+        } catch (error) {
+            showToast(error.message);
+        }
+    }
+
+    async function startConversation(user) {
+        try {
+            const otherUserId = user.other_user_id ?? user.id;
+
+            const data = await api('/api/chat/conversations', {
+                method: 'POST',
+                body: JSON.stringify({
+                    userId: otherUserId
+                })
+            });
+
+            const conversation = {
+                ...user,
+                conversation_id: data.conversationId,
+                other_user_id: otherUserId
+            };
+
+            searchInput.value = '';
+
+            await loadConversations();
+
+            await openConversation(conversation);
+
+        } catch (error) {
+            showToast(error.message);
+        }
+    }
+
+    async function openConversation(conversation) {
+        const conversationId = getConversationId(conversation);
+
+        if (conversationId == null) {
+            showToast('This conversation has no valid ID.');
+            return;
+        }
+
+        stopTyping();
+
+typingIndicator.hidden = true;
+clearTimeout(remoteTypingTimer);
+        const sequence = ++openSequence;
+
+        activeConversationId = Number(conversationId);
+        activeOtherUser = conversation;
+
+        knownMessageIds.clear();
+
+        app.classList.add('chat-open');
+
+        document.getElementById('chatName').textContent =
+            conversation.full_name || conversation.username || 'Conversation';
+
+            const chatStatusElement = document.getElementById('chatStatus');
+
+const otherUserId = Number(
+    conversation.other_user_id ??
+    conversation.user_id ??
+    conversation.id
+);
+
+const presenceData = presenceByUserId.get(otherUserId);
+
+if (presenceData?.online) {
+    chatStatusElement.textContent = 'Online';
+    chatStatusElement.className = 'online';
+} else if (presenceData?.lastSeenAt) {
+    chatStatusElement.textContent =
+        formatLastSeen(presenceData.lastSeenAt);
+
+    chatStatusElement.className = 'offline';
+} else {
+    chatStatusElement.textContent = 'Offline';
+    chatStatusElement.className = 'offline';
+}
+
+        createAvatar(
+            document.getElementById('chatAvatar'),
+            conversation
+        );
+
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+        attachButton.disabled = false;
+        voiceCallButton.disabled = false;
+videoCallButton.disabled = false;
+voiceNoteButton.disabled = false;
+
+        messagesContainer.replaceChildren();
+
+        const loading = document.createElement('div');
+        loading.className = 'empty-list';
+        loading.textContent = 'Loading messages...';
+
+        messagesContainer.appendChild(loading);
+
+        try {
+            const data = await api(
+                `/api/chat/conversations/${conversationId}/messages`
+            );
+
+            // Do not let an old request overwrite the newly opened chat.
+            if (
+                sequence !== openSequence ||
+                Number(activeConversationId) !== Number(conversationId)
+            ) {
+                return;
+            }
+
+            knownMessageIds.clear();
+            messagesContainer.replaceChildren();
+
+            for (const message of data.messages || []) {
+                appendMessage(message, conversationId);
+            }
+
+            if (!messagesContainer.children.length) {
+                showEmptyChat();
+            }
+
+
+
+            if (socket) {
+    if (socket.connected) {
+        socket.emit('conversation:join', conversationId);
+    } else {
+        socket.once('connect', () => {
+            socket.emit('conversation:join', conversationId);
+        });
+    }
+}
+// Mark messages received from the other user as read.
+try {
+    const result = await api(`/api/chat/conversations/${conversationId}/read`, {
+        method: 'POST',
+        body: JSON.stringify({})
+    });
+
+    if (result && result.success) {
+        // Refresh unread message counts immediately.
+        await loadConversations();
+    }
+} catch (error) {
+    console.error('Could not mark messages as read:', error);
+}
+
+scrollToBottom();
+
+            
+
+        } catch (error) {
+            if (sequence === openSequence) {
+                messagesContainer.replaceChildren();
+                showToast(error.message);
+            }
+        }
+    }
+
+    function showEmptyChat() {
+        const empty = document.createElement('div');
+
+        empty.className = 'empty-list';
+        empty.textContent = 'No messages yet. Say hello!';
+
+        messagesContainer.appendChild(empty);
+    }
+
+    function appendMessage(message, expectedConversationId) {
+        if (!message || typeof message !== 'object') {
+            console.error('Invalid NEXA message:', message);
+            return;
+        }
+
+        if (message.id == null) {
+            console.error('NEXA message has no ID:', message);
+            return;
+        }
+
+        // Reject messages that do not belong to the active conversation.
+        const messageConversationId = message.conversation_id
+            ?? message.conversationId;
+
+        const targetConversationId =
+            expectedConversationId ?? activeConversationId;
+
+        if (
+            messageConversationId != null &&
+            Number(messageConversationId) !== Number(targetConversationId)
+        ) {
+            return;
+        }
+
+        const messageId = Number(message.id);
+
+        if (knownMessageIds.has(messageId)) {
+            return;
+        }
+
+        const senderId = getSenderId(message);
+        const myId = getUserId(currentUser);
+
+        // Do not guess the alignment when sender identity is unknown.
+        if (senderId == null || myId == null) {
+            console.error('Cannot determine message ownership:', {
+                senderId,
+                myId,
+                message
+            });
+
+            showToast('Could not identify the message sender.');
+            return;
+        }
+
+        knownMessageIds.add(messageId);
+
+        const empty = messagesContainer.querySelector('.empty-list');
+
+        if (empty) {
+            empty.remove();
+        }
+
+        const mine = String(senderId) === String(myId);
+
+        const wrapper = document.createElement('div');
+        wrapper.dataset.messageId = message.id;
+
+        wrapper.className = mine
+            ? 'message mine'
+            : 'message';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+
+
+  
+        
+     // NEXA: Robust media message rendering.
+const messageType = String(
+    message.message_type ||
+    message.messageType ||
+    message.type ||
+    message.media_type ||
+    message.mediaType ||
+    ''
+).toLowerCase().replace(/-/g, '_');
+
+const rawMediaUrl =
+    message.media_url ||
+    message.mediaUrl ||
+    message.file_url ||
+    message.fileUrl ||
+    message.media_path ||
+    message.mediaPath ||
+    message.file_path ||
+    message.filePath ||
+    message.attachment_url ||
+    message.attachmentUrl ||
+    null;
+
+const mimeType = String(
+    message.mime_type ||
+    message.mimeType ||
+    message.mimetype ||
+    message.mime ||
+    ''
+).toLowerCase();
+
+let mediaUrl = null;
+
+if (typeof rawMediaUrl === 'string' && rawMediaUrl.trim()) {
+    try {
+        const parsedUrl = new URL(rawMediaUrl.trim(), window.location.origin);
+
+        // Only allow media served from this NEXA website.
+        if (
+            parsedUrl.origin === window.location.origin &&
+            !parsedUrl.pathname.split('/').includes('..') &&
+            parsedUrl.pathname.startsWith('/uploads/')
+        ) {
+            mediaUrl = parsedUrl.href;
+        }
+    } catch (error) {
+        console.error('NEXA: Invalid media URL:', rawMediaUrl);
+    }
+}
+
+const mediaPath = mediaUrl
+    ? new URL(mediaUrl).pathname.toLowerCase()
+    : '';
+
+const isAudio =
+    messageType === 'audio' ||
+    messageType === 'voice' ||
+    messageType === 'voice_note' ||
+    messageType === 'audio_message' ||
+    mimeType.startsWith('audio/') ||
+    /\.(webm|mp3|wav|ogg|oga|m4a|aac|opus|mp4)$/i.test(mediaPath);
+
+const isImage =
+    messageType === 'image' ||
+    mimeType.startsWith('image/') ||
+    /\.(jpg|jpeg|png|gif|webp|avif)$/i.test(mediaPath);
+
+const isVideo =
+    messageType === 'video' ||
+    mimeType.startsWith('video/') ||
+    /\.(mp4|webm|mov|m4v)$/i.test(mediaPath);
+
+if (mediaUrl && isAudio) {
+    // Voice note.
+    const audioPlayer = document.createElement('audio');
+
+    audioPlayer.controls = true;
+    audioPlayer.preload = 'metadata';
+    audioPlayer.src = mediaUrl;
+    audioPlayer.setAttribute('aria-label', 'Voice note');
+
+    audioPlayer.style.display = 'block';
+    audioPlayer.style.width = '100%';
+    audioPlayer.style.minWidth = '220px';
+    audioPlayer.style.maxWidth = '280px';
+
+    audioPlayer.addEventListener('error', () => {
+        console.error('NEXA: Voice note could not be loaded.', {
+            messageId: message.id,
+            messageType,
+            mimeType,
+            mediaUrl,
+            mediaError: audioPlayer.error?.code
+        });
+    });
+
+    bubble.appendChild(audioPlayer);
+
+} else if (mediaUrl && isImage) {
+    // Picture.
+    const image = document.createElement('img');
+
+    image.src = mediaUrl;
+    image.alt = 'Shared picture';
+    image.loading = 'lazy';
+    image.className = 'message-media';
+
+    image.style.display = 'block';
+    image.style.maxWidth = '100%';
+    image.style.maxHeight = '320px';
+    image.style.borderRadius = '10px';
+    image.style.objectFit = 'contain';
+
+    image.addEventListener('click', () => {
+        window.open(image.src, '_blank', 'noopener,noreferrer');
+    });
+
+    bubble.appendChild(image);
+
+} else if (mediaUrl && isVideo) {
+    // Video.
+    const video = document.createElement('video');
+
+    video.src = mediaUrl;
+    video.controls = true;
+    video.preload = 'metadata';
+    video.playsInline = true;
+    video.className = 'message-media';
+
+    video.style.display = 'block';
+    video.style.width = '100%';
+    video.style.maxWidth = '320px';
+    video.style.maxHeight = '320px';
+    video.style.borderRadius = '10px';
+
+    bubble.appendChild(video);
+
+} else if (rawMediaUrl || isAudio || isImage || isVideo) {
+    // Never leave an unidentified media message as a blank bubble.
+    bubble.textContent = isAudio
+        ? '🎤 Voice note unavailable'
+        : 'Media unavailable';
+
+    console.error('NEXA: Media message could not be rendered.', {
+        messageId: message.id,
+        messageType,
+        mimeType,
+        rawMediaUrl,
+        message
+    });
+
+} else {
+    // Normal text message.
+    bubble.textContent = message.message_text ?? '';
+}
+   
+
+
+const time = document.createElement('div');
+time.className = 'message-time';
+time.textContent = formatTime(message.created_at);
+
+const meta = document.createElement('div');
+meta.className = 'message-meta';
+meta.appendChild(time);
+
+
+if (mine) {
+    const status = document.createElement('span');
+    status.className = 'message-status';
+
+    // Determine the message status from the database timestamps.
+    if (message.read_at) {
+        status.textContent = '✓✓';
+        status.classList.add('read');
+        status.setAttribute('aria-label', 'Read');
+        status.title = 'Read';
+    } else if (message.delivered_at) {
+        status.textContent = '✓✓';
+        status.setAttribute('aria-label', 'Delivered');
+        status.title = 'Delivered';
+    } else {
+        status.textContent = '✓';
+        status.setAttribute('aria-label', 'Sent');
+        status.title = 'Sent';
+    }
+
+
+meta.appendChild(status);
+
+}
+
+wrapper.append(bubble, meta);
+messagesContainer.appendChild(wrapper);
+
+scrollToBottom();
+}
+
+
+
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+        const conversationId = activeConversationId;
+
+        if (!message || conversationId == null) return;
+
+        sendButton.disabled = true;
+
+        try {
+            const data = await api(
+                `/api/chat/conversations/${conversationId}/messages`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                }
+            );
+
+            if (
+                Number(activeConversationId) === Number(conversationId) &&
+                messageInput.value.trim() === message
+            ) {
+                messageInput.value = '';
+                messageInput.style.height = '45px';
+            }
+
+            if (data.message) {
+                if (
+                    Number(activeConversationId) === Number(conversationId)
+                ) {
+                    appendMessage(data.message, conversationId);
+                }
+            } else {
+                showToast('The server did not return the sent message.');
+                return;
+            }
+
+            await loadConversations();
+
+        } catch (error) {
+            showToast(error.message);
+
+        } finally {
+            sendButton.disabled = activeConversationId == null;
+
+            if (
+                Number(activeConversationId) === Number(conversationId)
+            ) {
+                messageInput.focus();
+            }
+        }
+    }
+
+
+    
+// ========================================
+// NEXA WHATSAPP-STYLE VOICE NOTES
+// ========================================
+
+voiceNoteButton.addEventListener('click', async () => {
+    if (activeConversationId == null) {
+        showToast('Open a conversation first.');
+        return;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+        showToast('Voice recording is not supported by this browser.');
+        return;
+    }
+
+    // Clicking the microphone starts recording.
+    // Clicking the stop button finishes recording.
+    if (isRecordingVoice && mediaRecorder) {
+        mediaRecorder.stop();
+        return;
+    }
+
+    try {
+        voiceStream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
+
+        voiceChunks = [];
+        recordedVoiceBlob = null;
+
+        let options = {};
+
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            options.mimeType = 'audio/webm;codecs=opus';
+        } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+            options.mimeType = 'audio/webm';
+        } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+            options.mimeType = 'audio/mp4';
+        }
+
+        mediaRecorder = new MediaRecorder(voiceStream, options);
+
+        mediaRecorder.ondataavailable = event => {
+            if (event.data && event.data.size > 0) {
+                voiceChunks.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = () => {
+            if (voiceRecordingTimerInterval) {
+                clearInterval(voiceRecordingTimerInterval);
+                voiceRecordingTimerInterval = null;
+            }
+
+            voiceRecordingStartedAt = null;
+
+            if (voiceRecordingIndicator) {
+                voiceRecordingIndicator.style.display = 'none';
+            }
+
+            if (voiceRecordingTimer) {
+                voiceRecordingTimer.textContent = '00:00';
+            }
+
+            voiceStream?.getTracks().forEach(track => track.stop());
+            voiceStream = null;
+            isRecordingVoice = false;
+
+            voiceNoteButton.textContent = '🎤';
+            voiceNoteButton.title = 'Record voice note';
+            voiceNoteButton.setAttribute('aria-label', 'Record voice note');
+
+            if (!voiceChunks.length) {
+                if (whatsappVoiceRecorder) {
+                    whatsappVoiceRecorder.style.display = 'none';
+                }
+
+                showToast('No audio was recorded.');
+                return;
+            }
+
+            const mimeType =
+                mediaRecorder?.mimeType ||
+                voiceChunks[0].type ||
+                'audio/webm';
+
+            recordedVoiceBlob = new Blob(voiceChunks, {
+                type: mimeType
+            });
+
+            if (recordedVoiceBlob.size > 50 * 1024 * 1024) {
+                recordedVoiceBlob = null;
+
+                if (whatsappVoiceRecorder) {
+                    whatsappVoiceRecorder.style.display = 'none';
+                }
+
+                showToast('The voice note exceeds the 50 MB limit.');
+                return;
+            }
+
+            if (voicePreviewUrl) {
+                URL.revokeObjectURL(voicePreviewUrl);
+            }
+
+            voicePreviewUrl = URL.createObjectURL(recordedVoiceBlob);
+
+            // Show the recorded voice note inside the WhatsApp-style bar.
+            if (whatsappVoiceRecorder) {
+                whatsappVoiceRecorder.style.display = 'flex';
+            }
+
+            if (waVoiceTimer) {
+                waVoiceTimer.textContent = 'Voice note ready';
+            }
+
+            if (waVoiceWaveform) {
+                waVoiceWaveform.style.display = 'none';
+            }
+
+            if (waVoicePreviewPlayer) {
+                waVoicePreviewPlayer.src = voicePreviewUrl;
+                waVoicePreviewPlayer.style.display = 'block';
+            }
+
+            if (stopVoiceRecording) {
+                stopVoiceRecording.style.display = 'none';
+            }
+
+            if (sendVoiceRecording) {
+                sendVoiceRecording.style.display = 'grid';
+                sendVoiceRecording.disabled = false;
+            }
+
+            if (cancelVoiceRecording) {
+                cancelVoiceRecording.style.display = 'grid';
+            }
+        };
+
+        mediaRecorder.start();
+
+        isRecordingVoice = true;
+
+        // Show the WhatsApp-style recording bar.
+        if (whatsappVoiceRecorder) {
+            whatsappVoiceRecorder.style.display = 'flex';
+        }
+
+        if (voiceRecordingIndicator) {
+            voiceRecordingIndicator.style.display = 'none';
+        }
+
+        if (waVoiceTimer) {
+            waVoiceTimer.textContent = '00:00';
+        }
+
+        if (waVoiceWaveform) {
+            waVoiceWaveform.style.display = 'flex';
+        }
+
+        if (waVoicePreviewPlayer) {
+            waVoicePreviewPlayer.pause();
+            waVoicePreviewPlayer.removeAttribute('src');
+            waVoicePreviewPlayer.style.display = 'none';
+            waVoicePreviewPlayer.load();
+        }
+
+        if (stopVoiceRecording) {
+            stopVoiceRecording.style.display = 'grid';
+        }
+
+        if (sendVoiceRecording) {
+            sendVoiceRecording.style.display = 'none';
+        }
+
+        voiceRecordingStartedAt = Date.now();
+
+        if (voiceRecordingTimerInterval) {
+            clearInterval(voiceRecordingTimerInterval);
+        }
+
+        voiceRecordingTimerInterval = setInterval(() => {
+            if (!voiceRecordingStartedAt) return;
+
+            const elapsedSeconds = Math.floor(
+                (Date.now() - voiceRecordingStartedAt) / 1000
+            );
+
+            const minutes = String(
+                Math.floor(elapsedSeconds / 60)
+            ).padStart(2, '0');
+
+            const seconds = String(
+                elapsedSeconds % 60
+            ).padStart(2, '0');
+
+            const time = `${minutes}:${seconds}`;
+
+            if (waVoiceTimer) {
+                waVoiceTimer.textContent = time;
+            }
+
+            if (voiceRecordingTimer) {
+                voiceRecordingTimer.textContent = time;
+            }
+        }, 250);
+
+        voiceNoteButton.textContent = '⏹';
+        voiceNoteButton.title = 'Stop recording';
+        voiceNoteButton.setAttribute('aria-label', 'Stop recording');
+
+        showToast('Recording started.');
+
+    } catch (error) {
+        console.error('NEXA microphone error:', error);
+
+        voiceStream?.getTracks().forEach(track => track.stop());
+        voiceStream = null;
+        isRecordingVoice = false;
+
+        if (voiceRecordingTimerInterval) {
+            clearInterval(voiceRecordingTimerInterval);
+            voiceRecordingTimerInterval = null;
+        }
+
+        if (whatsappVoiceRecorder) {
+            whatsappVoiceRecorder.style.display = 'none';
+        }
+
+        showToast(
+            error.name === 'NotAllowedError'
+                ? 'Allow microphone access to record a voice note.'
+                : 'Could not start recording. Check your microphone.'
+        );
+    }
+});
+
+// Stop recording using the square button.
+stopVoiceRecording?.addEventListener('click', () => {
+    if (isRecordingVoice && mediaRecorder?.state === 'recording') {
+        mediaRecorder.stop();
+    }
+});
+
+// Cancel recording or discard the recorded preview.
+cancelVoiceRecording?.addEventListener('click', () => {
+    if (isRecordingVoice && mediaRecorder) {
+        mediaRecorder.onstop = () => {
+            if (voiceRecordingTimerInterval) {
+                clearInterval(voiceRecordingTimerInterval);
+                voiceRecordingTimerInterval = null;
+            }
+
+            voiceRecordingStartedAt = null;
+
+            voiceStream?.getTracks().forEach(track => track.stop());
+            voiceStream = null;
+            isRecordingVoice = false;
+            voiceChunks = [];
+
+            voiceNoteButton.textContent = '🎤';
+            voiceNoteButton.title = 'Record voice note';
+            voiceNoteButton.setAttribute('aria-label', 'Record voice note');
+
+            if (whatsappVoiceRecorder) {
+                whatsappVoiceRecorder.style.display = 'none';
+            }
+        };
+
+        mediaRecorder.stop();
+        return;
+    }
+
+    if (voicePreviewUrl) {
+        URL.revokeObjectURL(voicePreviewUrl);
+        voicePreviewUrl = null;
+    }
+
+    recordedVoiceBlob = null;
+
+    if (waVoicePreviewPlayer) {
+        waVoicePreviewPlayer.pause();
+        waVoicePreviewPlayer.removeAttribute('src');
+        waVoicePreviewPlayer.load();
+        waVoicePreviewPlayer.style.display = 'none';
+    }
+
+    if (whatsappVoiceRecorder) {
+        whatsappVoiceRecorder.style.display = 'none';
+    }
+
+    if (waVoiceWaveform) {
+        waVoiceWaveform.style.display = 'flex';
+    }
+
+    if (waVoiceTimer) {
+        waVoiceTimer.textContent = '00:00';
+    }
+
+    showToast('Voice note cancelled.');
+});
+
+// Upload the recorded voice note.
+sendVoiceRecording?.addEventListener('click', async () => {
+    if (!recordedVoiceBlob) {
+        showToast('Record a voice note first.');
+        return;
+    }
+
+    if (activeConversationId == null) {
+        showToast('Open a conversation first.');
+        return;
+    }
+
+    const conversationId = activeConversationId;
+    const blob = recordedVoiceBlob;
+    const extension = blob.type.includes('mp4') ? 'mp4' : 'webm';
+
+    const formData = new FormData();
+
+    formData.append(
+        'media',
+        blob,
+        `voice-note.${extension}`
+    );
+
+    sendVoiceRecording.disabled = true;
+    sendVoiceRecording.textContent = '…';
+
+    try {
+        const response = await fetch(
+            `/api/chat/conversations/${conversationId}/media`,
+            {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            }
+        );
+
+        const data = await response.json();
+
+        console.log('NEXA VOICE NOTE RESPONSE:', data);
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || 'Could not send the voice note.'
+            );
+        }
+
+        if (
+            Number(activeConversationId) === Number(conversationId) &&
+            data.message
+        ) {
+            appendMessage(data.message, conversationId);
+        }
+
+        if (voicePreviewUrl) {
+            URL.revokeObjectURL(voicePreviewUrl);
+            voicePreviewUrl = null;
+        }
+
+        recordedVoiceBlob = null;
+
+        if (waVoicePreviewPlayer) {
+            waVoicePreviewPlayer.pause();
+            waVoicePreviewPlayer.removeAttribute('src');
+            waVoicePreviewPlayer.load();
+            waVoicePreviewPlayer.style.display = 'none';
+        }
+
+        if (whatsappVoiceRecorder) {
+            whatsappVoiceRecorder.style.display = 'none';
+        }
+
+        if (waVoiceWaveform) {
+            waVoiceWaveform.style.display = 'flex';
+        }
+
+        if (waVoiceTimer) {
+            waVoiceTimer.textContent = '00:00';
+        }
+
+        showToast('Voice note sent successfully.');
+        await loadConversations();
+
+    } catch (error) {
+        console.error('NEXA voice-note upload error:', error);
+
+        showToast(
+            error.message || 'Could not send the voice note.'
+        );
+
+        sendVoiceRecording.disabled = false;
+        sendVoiceRecording.textContent = '➤';
+    }
+});
+
+
+    // ========================================
+// SEND A PICTURE OR VIDEO
+// ========================================
+
+attachButton.addEventListener('click', () => {
+    if (activeConversationId == null) {
+        showToast('Open a conversation first.');
+        return;
+    }
+
+    mediaInput.click();
+});
+
+mediaInput.addEventListener('change', async () => {
+    const file = mediaInput.files[0];
+    const conversationId = activeConversationId;
+
+    if (!file || conversationId == null) {
+        mediaInput.value = '';
+        return;
+    }
+
+    const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'video/mp4',
+        'video/webm',
+        'video/quicktime'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+        showToast('Choose a supported picture or video.');
+        mediaInput.value = '';
+        return;
+    }
+
+    if (file.size > 50 * 1024 * 1024) {
+        showToast('The maximum file size is 50 MB.');
+        mediaInput.value = '';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('media', file);
+
+    attachButton.disabled = true;
+    attachButton.textContent = '…';
+
+    try {
+        const response = await fetch(
+            `/api/chat/conversations/${conversationId}/media`,
+            {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || 'Media upload failed.');
+        }
+
+        if (
+            Number(activeConversationId) === Number(conversationId) &&
+            data.message
+        ) {
+            appendMessage(data.message, conversationId);
+        }
+
+        showToast('Media sent successfully.');
+
+    } catch (error) {
+        console.error('NEXA media upload error:', error);
+        showToast(error.message || 'Could not send the picture or video.');
+
+    } finally {
+        attachButton.disabled = activeConversationId == null;
+        attachButton.textContent = '📎';
+        mediaInput.value = '';
+    }
+});
+
+
+
+    // Search
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimer);
+
+        const query = searchInput.value.trim();
+
+        searchTimer = setTimeout(() => {
+            if (query.length < 2) {
+                searchSequence++;
+                document.getElementById('listHeading').textContent = 'Messages';
+                renderConversations(conversations);
+            } else {
+                searchPeople(query);
+            }
+        }, 300);
+    });
+
+    // Send message
+    messageForm.addEventListener('submit', event => {
+        event.preventDefault();
+        sendMessage();
+    });
+
+    messageInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            messageForm.requestSubmit();
+        }
+    });
+
+    // Resize input as the user types.
+    messageInput.addEventListener('input', () => {
+        messageInput.style.height = '45px';
+
+        messageInput.style.height =
+            Math.min(messageInput.scrollHeight, 120) + 'px';
+    });
+
+    // Mobile back button
+    document.getElementById('backButton').addEventListener('click', () => {
+        app.classList.remove('chat-open');
+    });
+
+    // Refresh conversation list
+    document.getElementById('refreshButton').addEventListener('click', () => {
+        loadConversations().catch(error => showToast(error.message));
+    });
+
+    // Log out
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+        if (!confirm('Do you want to log out of NEXA?')) return;
+
+        try {
+            await api('/api/auth/logout', {
+                method: 'POST',
+                body: JSON.stringify({})
+            });
+
+            window.location.href = '/login.html';
+
+        } catch (error) {
+            showToast(error.message);
+        }
+    });
+
+
+    // ========================================
+// NEXA VOICE AND VIDEO CALLING FUNCTIONS
+// ========================================
+
+const rtcConfiguration = {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+    ]
+};
+
+// Send call signals through the authenticated Socket.IO connection.
+function sendCallSignal(type, payload = {}) {
+    if (!socket || !socket.connected || !activeCall) {
+        showToast('The connection to the server is unavailable.');
+        return false;
+    }
+
+    socket.emit('call:signal', {
+        conversationId: activeCall.conversationId,
+        targetUserId: activeCall.targetUserId,
+        type,
+        payload
+    });
+
+    return true;
+}
+
+// Display the call window with the other person's name.
+function showCallWindow(title, status) {
+    callOverlay.style.display = 'flex';
+
+    const personName = activeOtherUser
+        ? (
+            activeOtherUser.full_name ||
+            activeOtherUser.username ||
+            'NEXA User'
+        )
+        : 'NEXA User';
+
+    callTitle.textContent = personName;
+    callStatus.textContent = status;
+}
+
+
+// Create the WebRTC peer connection.
+function createPeerConnection() {
+    if (peerConnection) {
+        peerConnection.close();
+    }
+
+    peerConnection = new RTCPeerConnection(rtcConfiguration);
+
+    peerConnection.onicecandidate = event => {
+        if (event.candidate && activeCall) {
+            sendCallSignal('ice-candidate', {
+                candidate: event.candidate
+            });
+        }
+    };
+
+    peerConnection.ontrack = event => {
+        if (event.streams && event.streams[0]) {
+            remoteVideo.srcObject = event.streams[0];
+
+            if (callType === 'video') {
+                remoteVideoContainer.style.display = 'block';
+            }
+
+            callStatus.textContent = 'Connected';
+        }
+    };
+
+    peerConnection.onconnectionstatechange = () => {
+    if (!peerConnection) return;
+
+    if (peerConnection.connectionState === 'connected') {
+        startCallTimer();
+    } else if (
+        peerConnection.connectionState === 'failed'
+    ) {
+        stopCallTimer();
+
+        callStatus.textContent =
+            'Connection failed. Check your network.';
+    } else if (
+        peerConnection.connectionState === 'disconnected'
+    ) {
+        stopCallTimer();
+
+        callStatus.textContent =
+            'Connection interrupted...';
+    }
+};
+
+    if (localCallStream) {
+        localCallStream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, localCallStream);
+        });
+    }
+
+    return peerConnection;
+}
+
+// Start counting the duration of a connected call.
+function startCallTimer() {
+    stopCallTimer();
+
+    callStartedAt = Date.now();
+
+    const updateTimer = () => {
+        if (!callStartedAt) return;
+
+        const totalSeconds = Math.floor(
+            (Date.now() - callStartedAt) / 1000
+        );
+
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        callStatus.textContent =
+            `Connected · ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+
+    updateTimer();
+    callTimerInterval = setInterval(updateTimer, 1000);
+}
+
+// Stop and reset the call timer.
+function stopCallTimer() {
+    if (callTimerInterval !== null) {
+        clearInterval(callTimerInterval);
+        callTimerInterval = null;
+    }
+
+    callStartedAt = null;
+}
+
+// Request microphone access and, for video calls, camera access.
+async function prepareCallMedia(type) {
+    if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error(
+            'Microphone and camera access require HTTPS or localhost.'
+        );
+    }
+
+    localCallStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: type === 'video'
+    });
+
+    localVideo.srcObject = localCallStream;
+    localVideo.style.display =
+        type === 'video' ? 'block' : 'none';
+
+    remoteVideoContainer.style.display =
+        type === 'video' ? 'block' : 'none';
+
+    activeCallActions.style.display = 'flex';
+    incomingCallActions.style.display = 'none';
+
+    muteCallButton.textContent = '🎙️ Mute';
+    cameraCallButton.style.display =
+        type === 'video' ? 'inline-block' : 'none';
+}
+
+// Start an outgoing voice or video call.
+async function startCall(type) {
+    if (activeConversationId == null || !activeOtherUser) {
+        showToast('Open a conversation before calling.');
+        return;
+    }
+
+    if (!socket || !socket.connected) {
+        showToast('Connecting to NEXA. Please try again.');
+        return;
+    }
+
+    const targetUserId = Number(activeOtherUser.other_user_id);
+
+    if (!Number.isSafeInteger(targetUserId) || targetUserId <= 0) {
+        showToast('Could not identify the person you want to call.');
+        return;
+    }
+
+    if (activeCall || incomingCall) {
+        showToast('You already have a call in progress.');
+        return;
+    }
+
+    activeCall = {
+        conversationId: Number(activeConversationId),
+        targetUserId
+    };
+
+    callType = type;
+    isCallInitiator = true;
+
+    voiceCallButton.disabled = true;
+    videoCallButton.disabled = true;
+
+    try {
+        showCallWindow(
+            type === 'video' ? 'NEXA Video Call' : 'NEXA Voice Call',
+            'Requesting microphone and camera permission...'
+        );
+
+        await prepareCallMedia(type);
+
+        const pc = createPeerConnection();
+
+        const offer = await pc.createOffer();
+
+        await pc.setLocalDescription(offer);
+
+        if (!sendCallSignal('offer', {
+            sdp: pc.localDescription,
+            callType: type
+        })) {
+            throw new Error('Could not send the call invitation.');
+        }
+
+        callStatus.textContent = 'Calling...';
+    } catch (error) {
+        console.error('NEXA call start error:', error);
+
+        showToast(error.message || 'Could not start the call.');
+
+        cleanupCall(false);
+    }
+}
+
+// Close the call and release the microphone and camera.
+function cleanupCall(notifyPeer = false) {
+    stopCallTimer();
+
+    if (notifyPeer && activeCall) {
+        sendCallSignal('end');
+    }
+
+    if (peerConnection) {
+        peerConnection.ontrack = null;
+        peerConnection.onicecandidate = null;
+        peerConnection.close();
+        peerConnection = null;
+    }
+
+    if (localCallStream) {
+        localCallStream.getTracks().forEach(track => track.stop());
+        localCallStream = null;
+    }
+
+    localVideo.srcObject = null;
+    remoteVideo.srcObject = null;
+
+    localVideo.style.display = 'none';
+    remoteVideoContainer.style.display = 'none';
+
+    incomingCallActions.style.display = 'none';
+    activeCallActions.style.display = 'none';
+
+    callOverlay.style.display = 'none';
+
+    activeCall = null;
+    incomingCall = null;
+    callType = null;
+    isCallInitiator = false;
+
+    voiceCallButton.disabled = activeConversationId == null;
+    videoCallButton.disabled = activeConversationId == null;
+}
+// Accept an incoming voice or video call.
+acceptCallButton.addEventListener('click', async () => {
+    if (!incomingCall || !activeCall) {
+        return;
+    }
+
+    try {
+        incomingCallActions.style.display = 'flex';
+        callStatus.textContent = 'Connecting...';
+
+        await prepareCallMedia(callType);
+
+        const pc = createPeerConnection();
+
+        await pc.setRemoteDescription(
+            new RTCSessionDescription(incomingCall.payload.sdp)
+        );
+
+        for (const candidate of pendingIceCandidates) {
+            await pc.addIceCandidate(
+                new RTCIceCandidate(candidate)
+            );
+        }
+
+        pendingIceCandidates = [];
+
+        const answer = await pc.createAnswer();
+
+        await pc.setLocalDescription(answer);
+
+        sendCallSignal('answer', {
+            sdp: pc.localDescription
+        });
+
+        incomingCall = null;
+        callStatus.textContent = 'Connecting...';
+
+    } catch (error) {
+        console.error('NEXA accept call error:', error);
+
+        showToast(
+            error.message || 'Could not accept the call.'
+        );
+
+        cleanupCall(true);
+    }
+});
+
+
+// Decline an incoming call.
+declineCallButton.addEventListener('click', () => {
+if (!incomingCall || !activeCall) {
+return;
+}
+
+
+sendCallSignal('decline');
+cleanupCall(false);
+
+
+});
+
+// End an active call.
+endCallButton.addEventListener('click', () => {
+if (!activeCall) {
+return;
+}
+
+cleanupCall(true);
+
+
+});
+
+    // Toggle microphone mute.
+muteCallButton.addEventListener('click', () => {
+if (!localCallStream) return;
+
+
+const audioTracks = localCallStream.getAudioTracks();
+
+if (audioTracks.length === 0) {
+    showToast('No microphone is available.');
+    return;
+}
+
+const shouldEnable = audioTracks.some(track => !track.enabled);
+
+audioTracks.forEach(track => {
+    track.enabled = shouldEnable;
+});
+
+muteCallButton.textContent = shouldEnable
+    ? '🎙️ Mute'
+    : '🔇 Unmute';
+
+});
+
+// Toggle camera on and off.
+cameraCallButton.addEventListener('click', () => {
+if (!localCallStream || callType !== 'video') return;
+
+
+const videoTracks = localCallStream.getVideoTracks();
+
+if (videoTracks.length === 0) {
+    showToast('No camera is available.');
+    return;
+}
+
+const shouldEnable = videoTracks.some(track => !track.enabled);
+
+videoTracks.forEach(track => {
+    track.enabled = shouldEnable;
+});
+
+cameraCallButton.textContent = shouldEnable
+    ? '📷 Camera Off'
+    : '📷 Camera On';
+
+
+});
+    
+
+
+    // NEXA VOICE AND VIDEO CALL BUTTONS
+
+voiceCallButton.addEventListener('click', () => {
+    startCall('audio');
+});
+
+videoCallButton.addEventListener('click', () => {
+    startCall('video');
+});
+
+
+    // Initialize application.
+    async function initialize() {
+        try {
+            await loadCurrentUser();
+            await loadConversations();
+
+            socket = io();
+            // ========================================
+// NEXA TYPING INDICATORS
+// ========================================
+
+messageInput.addEventListener('input', () => {
+    if (!socket || !socket.connected || activeConversationId == null) {
+        return;
+    }
+
+    if (messageInput.value.trim().length === 0) {
+        stopTyping();
+        return;
+    }
+
+    if (!isTyping) {
+        isTyping = true;
+
+        socket.emit('typing:start', {
+            conversationId: activeConversationId
+        });
+    }
+
+    // Stop the indicator after 1.2 seconds without typing.
+    clearTimeout(typingTimer);
+
+    typingTimer = setTimeout(() => {
+        stopTyping();
+    }, 1200);
+});
+
+// Receive typing updates from other participants.
+socket.on('typing:update', (data) => {
+    if (!data || data.conversationId == null) return;
+
+    if (
+        Number(data.conversationId) !==
+        Number(activeConversationId)
+    ) {
+        return;
+    }
+
+    if (data.typing) {
+        typingIndicator.textContent = 'Typing…';
+        typingIndicator.hidden = false;
+
+        clearTimeout(remoteTypingTimer);
+
+        // Automatically hide a stale indicator.
+        remoteTypingTimer = setTimeout(() => {
+            typingIndicator.hidden = true;
+        }, 2500);
+
+    } else {
+        typingIndicator.hidden = true;
+        clearTimeout(remoteTypingTimer);
+    }
+});
+            socket.on('disconnect', reason => {
+    console.log('NEXA SOCKET DISCONNECTED:', reason);
+});
+
+            socket.on('connect_error', error => {
+                console.error('NEXA real-time connection error:', error.message);
+            console.log('NEXA SOCKET CONNECTED:', socket.id);
+            });
+
+            socket.on('connect', () => {
+                if (activeConversationId != null) {
+                    socket.emit('conversation:join', activeConversationId);
+                }
+            });
+
+            // NEXA: Listen for incoming voice and video calls.
+socket.on('call:incoming-signal', async data => {
+    console.log('NEXA: Incoming call signal received:', data);
+
+    if (!data || !data.type) return;
+
+    const conversationId = Number(data.conversationId);
+    const fromUserId = Number(data.fromUserId);
+
+    // Handle an incoming call invitation.
+    if (data.type === 'offer') {
+        if (activeCall || incomingCall) {
+            socket.emit('call:signal', {
+                conversationId,
+                targetUserId: fromUserId,
+                type: 'busy',
+                payload: {}
+            });
+            return;
+        }
+
+        incomingCall = {
+            conversationId,
+            fromUserId,
+            payload: data.payload
+        };
+
+        activeCall = {
+            conversationId,
+            targetUserId: fromUserId
+        };
+
+        callType = data.payload?.callType === 'video'
+            ? 'video'
+            : 'audio';
+
+        isCallInitiator = false;
+
+        voiceCallButton.disabled = true;
+        videoCallButton.disabled = true;
+
+        showCallWindow(
+            callType === 'video'
+                ? 'Incoming NEXA Video Call'
+                : 'Incoming NEXA Voice Call',
+            'Someone is calling you...'
+        );
+
+        incomingCallActions.style.display = 'flex';
+        activeCallActions.style.display = 'none';
+
+        return;
+    }
+
+    // Handle the answer to an outgoing call.
+    if (data.type === 'answer') {
+        if (!activeCall || !peerConnection || !data.payload?.sdp) {
+            return;
+        }
+
+        try {
+            await peerConnection.setRemoteDescription(
+                new RTCSessionDescription(data.payload.sdp)
+            );
+
+            for (const candidate of pendingIceCandidates) {
+                await peerConnection.addIceCandidate(
+                    new RTCIceCandidate(candidate)
+                );
+            }
+
+            pendingIceCandidates = [];
+            callStatus.textContent = 'Connecting...';
+        } catch (error) {
+            console.error('NEXA call answer error:', error);
+            showToast('Could not connect the call.');
+            cleanupCall(false);
+        }
+
+        return;
+    }
+
+    // Handle network candidates received during a call.
+    if (data.type === 'ice-candidate') {
+        if (!activeCall || !data.payload?.candidate) {
+            return;
+        }
+
+        try {
+            if (
+                peerConnection &&
+                peerConnection.remoteDescription
+            ) {
+                await peerConnection.addIceCandidate(
+                    new RTCIceCandidate(data.payload.candidate)
+                );
+            } else {
+                pendingIceCandidates.push(data.payload.candidate);
+            }
+        } catch (error) {
+            console.error('NEXA ICE candidate error:', error);
+        }
+
+        return;
+    }
+
+    // Handle declined, ended, or busy calls.
+    if (
+        data.type === 'decline' ||
+        data.type === 'end' ||
+        data.type === 'busy'
+    ) {
+        const message = data.type === 'decline'
+            ? 'The call was declined.'
+            : data.type === 'busy'
+                ? 'The person is busy on another call.'
+                : 'The call has ended.';
+
+        cleanupCall(false);
+        showToast(message);
+    }
+});
+
+            
+socket.on('message:new', async message => {
+    if (!message) return;
+
+    const messageConversationId = Number(
+        message.conversation_id ?? message.conversationId
+    );
+
+    const senderId = getSenderId(message);
+    const myId = getUserId(currentUser);
+
+    // Ignore messages that cannot be identified safely.
+    if (!Number.isFinite(messageConversationId) || senderId == null) {
+        return;
+    }
+
+    const isMyMessage = String(senderId) === String(myId);
+
+    const isOpenConversation =
+        Number(activeConversationId) === messageConversationId;
+
+    // Display the message if its conversation is currently open.
+    if (isOpenConversation) {
+        appendMessage(message, activeConversationId);
+    }
+
+    // Refresh unread counts and latest-message previews immediately.
+    try {
+        await loadConversations();
+    } catch (error) {
+        console.error('Conversation refresh failed:', error);
+    }
+});
+
+
+socket.on('messages:read', data => {
+    if (
+        !data ||
+        Number(data.conversationId) !== Number(activeConversationId)
+    ) {
+        return;
+    }
+
+    const readMessageIds = (data.messageIds || []).map(Number);
+
+    readMessageIds.forEach(messageId => {
+        const messageElement = document.querySelector(
+            `[data-message-id="${messageId}"]`
+        );
+
+        if (!messageElement) return;
+
+        const status = messageElement.querySelector('.message-status');
+
+        if (!status) return;
+
+        status.textContent = '✓✓';
+        status.classList.add('read');
+        status.setAttribute('aria-label', 'Read');
+        status.title = 'Read';
+    });
+});
+
+    // NEXA: Update contact presence in real time.
+socket.on('presence:update', data => {
+    if (!data || data.userId == null) return;
+
+    const userId = Number(data.userId);
+
+    if (!Number.isSafeInteger(userId) || userId <= 0) return;
+
+    const presenceData = {
+        online: Boolean(data.online),
+        lastSeenAt: data.lastSeenAt || null
+    };
+
+    presenceByUserId.set(userId, presenceData);
+
+    console.log('NEXA presence update:', {
+        userId,
+        ...presenceData
+    });
+
+    // Update the contact's status in the sidebar.
+    const row = conversationList.querySelector(
+        `[data-user-id="${userId}"]`
+    );
+
+    if (row) {
+        const presence = row.querySelector('.contact-presence');
+        const statusText = presence?.querySelector('span:last-child');
+
+        if (presence && statusText) {
+            presence.classList.toggle(
+                'online',
+                presenceData.online
+            );
+
+            presence.classList.toggle(
+                'offline',
+                !presenceData.online
+            );
+
+            statusText.textContent = presenceData.online
+                ? 'Online'
+                : formatLastSeen(presenceData.lastSeenAt);
+        }
+    }
+
+    // Update the header if this contact's conversation is open.
+    const activeUserId = Number(
+        activeOtherUser?.other_user_id ??
+        activeOtherUser?.user_id ??
+        activeOtherUser?.id
+    );
+
+    if (activeUserId === userId) {
+        const statusElement = document.getElementById('chatStatus');
+
+        statusElement.textContent = presenceData.online
+            ? 'Online'
+            : formatLastSeen(presenceData.lastSeenAt);
+
+        statusElement.className = presenceData.online
+            ? 'online'
+            : 'offline';
+    }
+});
+
+function formatLastSeen(lastSeenAt) {
+    if (!lastSeenAt) return 'Offline';
+
+    // MySQL DATETIME values have no timezone indicator.
+    const date = new Date(
+        String(lastSeenAt).replace(' ', 'T')
+    );
+
+    if (Number.isNaN(date.getTime())) return 'Offline';
+
+    return 'Last seen ' + date.toLocaleString([], {
+        dateStyle: 'short',
+        timeStyle: 'short'
+    });
+}
+
+        } catch (error) {
+            showToast(error.message);
+            console.error('NEXA initialization failed:', error);
+        }
+    }
+
+    initialize();
+
+})();
+</script>
+
+
+</body>
+</html>

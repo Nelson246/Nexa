@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<meta name="theme-color" content="#1685F8">
+<meta name="description" content="NEXA - Connect. Chat. Share.">
+
+<title>NEXA — Connect. Chat. Share.</title>
+
+<link rel="stylesheet" href="/css/style.css">
+```
+
+</head>
+
+<body>
+    <header class="navbar">
+        <a class="brand" href="/">
+            <span class="brand-icon">N</span>
+            <span>NEXA</span>
+        </a>
+
+
+    <nav>
+        <a href="#features">Features</a>
+        <a href="/login.html" class="login-link">Log in</a>
+        <a href="/register.html" class="button button-small">Get Started</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="hero-badge">
+            YOUR WORLD. YOUR CONVERSATIONS.
+        </div>
+
+        <h1>
+            Connect with people.<br>
+            <span>Anywhere, anytime.</span>
+        </h1>
+
+        <p class="hero-description">
+            Meet NEXA, your space for conversations, communities,
+            and sharing moments with the people who matter.
+        </p>
+
+        <div class="hero-actions">
+            <a href="/register.html" class="button">Create Your Account</a>
+            <a href="/login.html" class="button button-outline">Log In</a>
+        </div>
+
+        <div class="chat-preview">
+            <div class="preview-header">
+                <div class="preview-avatar">N</div>
+
+                <div>
+                    <strong>NEXA</strong>
+                    <p>Your conversations start here.</p>
+                </div>
+
+                <span class="online-indicator" aria-label="Online"></span>
+            </div>
+
+            <div class="preview-message received">
+                Welcome to NEXA! 👋
+            </div>
+
+            <div class="preview-message sent">
+                A new way to stay connected. 💙
+            </div>
+
+            <div class="preview-input">
+                <span>Message NEXA...</span>
+                <button type="button" disabled aria-label="Send preview message">➤</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="section-heading">
+            <span>WHY NEXA?</span>
+            <h2>Everything starts with a conversation.</h2>
+        </div>
+
+        <div class="feature-grid">
+            <article class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3>Instant Messaging</h3>
+                <p>Chat with friends and connect with people in real time.</p>
+            </article>
+
+            <article class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Communities</h3>
+                <p>Bring people together through groups and shared interests.</p>
+            </article>
+
+            <article class="feature-card">
+                <div class="feature-icon">📎</div>
+                <h3>Share More</h3>
+                <p>Our planned messaging features will help you share files and moments.</p>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <a class="brand footer-brand" href="/">NEXA</a>
+    <p>Connect. Chat. Share.</p>
+    <p>© <span id="year"></span> NEXA. All rights reserved.</p>
+</footer>
+
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+
+</body>
+</html>

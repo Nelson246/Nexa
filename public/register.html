@@ -1,0 +1,579 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#087cf0">
+    <title>Create Account | NEXA</title>
+
+    <style>
+        :root {
+            --primary: #087cf0;
+            --primary-dark: #0564c5;
+            --background: #f3f7fd;
+            --text: #172b4d;
+            --muted: #64748b;
+            --border: #dbe5f1;
+            --white: #ffffff;
+            --success: #12805c;
+            --danger: #d92d20;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 24px 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top left, #dceeff, transparent 40%),
+                var(--background);
+            color: var(--text);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            background: var(--white);
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 15px 45px rgba(24, 74, 130, 0.10);
+        }
+
+        .logo {
+            text-align: center;
+            color: var(--primary);
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            margin-bottom: 4px;
+        }
+
+        .tagline {
+            text-align: center;
+            color: var(--muted);
+            margin: 0 0 26px;
+            font-size: 14px;
+        }
+
+        h1 {
+            font-size: 25px;
+            margin: 0 0 8px;
+        }
+
+        .description {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0 0 22px;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 7px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(8, 124, 240, 0.12);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        }
+
+        button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
+            margin: 16px 0;
+            padding: 12px;
+            border-radius: 9px;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .message.error {
+            display: block;
+            background: #fff0ef;
+            color: var(--danger);
+        }
+
+        .message.success {
+            display: block;
+            background: #eafaf3;
+            color: var(--success);
+        }
+
+        .message.info {
+            display: block;
+            background: #eef6ff;
+            color: #0755a5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 22px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .code-input {
+            text-align: center;
+            letter-spacing: 10px;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .resend {
+            margin-top: 12px;
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+
+        .resend:hover {
+            background: #f0f7ff;
+            color: var(--primary-dark);
+        }
+
+        .back-button {
+            margin-top: 10px;
+            background: #eef3f9;
+            color: var(--text);
+        }
+
+        .back-button:hover {
+            background: #e1eaf5;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <div class="logo">NEXA</div>
+        <p class="tagline">Connect. Chat. Share.</p>
+
+        <section id="registrationSection">
+            <h1>Create your account</h1>
+            <p class="description">
+                Join NEXA to connect, chat, and share with people.
+            </p>
+
+            <form id="registerForm">
+                <div class="field">
+                    <label for="full_name">Full name</label>
+                    <input
+                        type="text"
+                        id="full_name"
+                        name="full_name"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="username">Username</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Choose a username"
+                        autocomplete="username"
+                        minlength="3"
+                        maxlength="30"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="email">Email address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a strong password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="confirm_password">Confirm password</label>
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
+                        placeholder="Enter your password again"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="verification_method">Verification method</label>
+                    <select id="verification_method" name="verification_method">
+                        <option value="email" selected>Email verification</option>
+                        <option value="phone">Phone verification (coming soon)</option>
+                    </select>
+                </div>
+
+                <div id="registerMessage" class="message" role="alert"></div>
+
+                <button type="submit" id="registerButton">
+                    Create Account
+                </button>
+            </form>
+        </section>
+
+        <section id="verificationSection" class="hidden">
+            <h1>Verify your email</h1>
+            <p class="description">
+                We've requested a six-digit verification code for
+                <strong id="verificationEmail"></strong>.
+                Enter the code below to verify your account.
+            </p>
+
+            <form id="verifyForm">
+                <div class="field">
+                    <label for="verificationCode">Six-digit code</label>
+                    <input
+                        type="text"
+                        id="verificationCode"
+                        class="code-input"
+                        name="code"
+                        placeholder="000000"
+                        inputmode="numeric"
+                        pattern="[0-9]{6}"
+                        maxlength="6"
+                        autocomplete="one-time-code"
+                        required
+                    >
+                </div>
+
+                <div id="verifyMessage" class="message" role="alert"></div>
+
+                <button type="submit" id="verifyButton">
+                    Verify Email
+                </button>
+            </form>
+
+            <button type="button" class="resend" id="resendButton">
+                Resend Verification Code
+            </button>
+
+            <button type="button" class="back-button" id="backButton">
+                Back to Registration
+            </button>
+        </section>
+
+        <div class="footer" id="pageFooter">
+            Already have an account?
+            <a href="/login.html">Log in</a>
+        </div>
+    </main>
+
+    <script>
+        const registerForm = document.getElementById('registerForm');
+        const verifyForm = document.getElementById('verifyForm');
+
+        const registrationSection = document.getElementById('registrationSection');
+        const verificationSection = document.getElementById('verificationSection');
+
+        const registerMessage = document.getElementById('registerMessage');
+        const verifyMessage = document.getElementById('verifyMessage');
+
+        const registerButton = document.getElementById('registerButton');
+        const verifyButton = document.getElementById('verifyButton');
+        const resendButton = document.getElementById('resendButton');
+
+        const verificationMethod = document.getElementById('verification_method');
+        const emailInput = document.getElementById('email');
+        const verificationEmail = document.getElementById('verificationEmail');
+
+        let pendingEmail = '';
+
+        function showMessage(element, message, type = 'info') {
+            element.textContent = message;
+            element.className = 'message ' + type;
+        }
+
+        function clearMessage(element) {
+            element.textContent = '';
+            element.className = 'message';
+        }
+
+        async function sendRequest(url, data) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            });
+
+            let result;
+
+            try {
+                result = await response.json();
+            } catch {
+                throw new Error('The server returned an invalid response. Please try again.');
+            }
+
+            if (!response.ok) {
+                const error = new Error(
+                    result.message || result.error || 'The request failed.'
+                );
+                error.status = response.status;
+                error.data = result;
+                throw error;
+            }
+
+            return result;
+        }
+
+        function showVerification(email, message) {
+            pendingEmail = email;
+            verificationEmail.textContent = email;
+
+            registrationSection.classList.add('hidden');
+            verificationSection.classList.remove('hidden');
+
+            document.getElementById('pageFooter').classList.add('hidden');
+
+            clearMessage(verifyMessage);
+
+            if (message) {
+                showMessage(verifyMessage, message, 'info');
+            }
+
+            document.getElementById('verificationCode').focus();
+        }
+
+        registerForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            clearMessage(registerMessage);
+
+            const fullName = document.getElementById('full_name').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const email = emailInput.value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const method = verificationMethod.value;
+
+            if (password !== confirmPassword) {
+                showMessage(registerMessage, 'The passwords do not match.', 'error');
+                return;
+            }
+
+            if (method === 'phone') {
+                showMessage(
+                    registerMessage,
+                    'Phone verification is not available yet. Please choose email verification.',
+                    'info'
+                );
+                return;
+            }
+
+            registerButton.disabled = true;
+            registerButton.textContent = 'Creating account...';
+
+            try {
+                const result = await sendRequest('/api/auth/register', {
+                    full_name: fullName,
+                    username: username,
+                    email: email,
+                    password: password,
+                    confirm_password: confirmPassword,
+                    verification_method: method
+                });
+
+                showVerification(
+                    email,
+                    result.message || 'Your account was created. Check your inbox for the verification code.'
+                );
+            } catch (error) {
+                if (
+                    error.data &&
+                    error.data.accountCreated === true
+                ) {
+                    showVerification(
+                        email,
+                        'Your account was created, but the email could not be sent. Try resending the code.'
+                    );
+                } else {
+                    showMessage(registerMessage, error.message, 'error');
+                }
+            } finally {
+                registerButton.disabled = false;
+                registerButton.textContent = 'Create Account';
+            }
+        });
+
+        verifyForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            clearMessage(verifyMessage);
+
+            const code = document.getElementById('verificationCode').value.trim();
+
+            if (!/^\d{6}$/.test(code)) {
+                showMessage(
+                    verifyMessage,
+                    'Enter the six-digit code from your email.',
+                    'error'
+                );
+                return;
+            }
+
+            verifyButton.disabled = true;
+            verifyButton.textContent = 'Verifying...';
+
+            try {
+                const result = await sendRequest('/api/auth/verify-email', {
+                    email: pendingEmail,
+                    code: code
+                });
+
+                showMessage(
+                    verifyMessage,
+                    result.message || 'Your email has been verified successfully.',
+                    'success'
+                );
+
+                verifyForm.classList.add('hidden');
+                resendButton.classList.add('hidden');
+                document.getElementById('backButton').textContent = 'Go to Login';
+
+            } catch (error) {
+                showMessage(verifyMessage, error.message, 'error');
+            } finally {
+                verifyButton.disabled = false;
+                verifyButton.textContent = 'Verify Email';
+            }
+        });
+
+        resendButton.addEventListener('click', async function () {
+            clearMessage(verifyMessage);
+
+            resendButton.disabled = true;
+            resendButton.textContent = 'Sending...';
+
+            try {
+                const result = await sendRequest('/api/auth/resend-code', {
+                    email: pendingEmail
+                });
+
+                showMessage(
+                    verifyMessage,
+                    result.message || 'A new verification code has been sent.',
+                    'success'
+                );
+            } catch (error) {
+                showMessage(verifyMessage, error.message, 'error');
+            } finally {
+                resendButton.disabled = false;
+                resendButton.textContent = 'Resend Verification Code';
+            }
+        });
+
+        document.getElementById('backButton').addEventListener('click', function () {
+            if (this.textContent === 'Go to Login') {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            verificationSection.classList.add('hidden');
+            registrationSection.classList.remove('hidden');
+            document.getElementById('pageFooter').classList.remove('hidden');
+            clearMessage(registerMessage);
+        });
+
+        verificationMethod.addEventListener('change', function () {
+            if (this.value === 'phone') {
+                showMessage(
+                    registerMessage,
+                    'Phone verification is coming soon. Select email verification to create your account.',
+                    'info'
+                );
+            } else {
+                clearMessage(registerMessage);
+            }
+        });
+    </script>
+</body>
+</html>
