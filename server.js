@@ -10,6 +10,7 @@ const { Server } = require('socket.io');
 const { testConnection, pool } = require('./config/db');
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 
 const PORT = process.env.PORT || 3000;
