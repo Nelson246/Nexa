@@ -1,123 +1,121 @@
-const nodemailer = require('nodemailer');
-require('dotenv').config();
+const APP_NAME = 'NEXA';
 
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: Number(process.env.SMTP_PORT) || 465,
-    secure: Number(process.env.SMTP_PORT || 465) === 465,
+const RESEND_API_URL = 'https://api.resend.com/emails';
 
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+async function sendEmail({ to, subject, html, text }) {
+    const apiKey = process.env.RESEND_API_KEY;
+
+    if (!apiKey) {
+        throw new Error('RESEND_API_KEY is missing from environment variables.');
     }
-});
 
-// Verify the email server connection
-transporter.verify()
-    .then(() => {
-        console.log('NEXA email server connected successfully.');
-    })
-    .catch((error) => {
-        console.error('NEXA email connection failed:', error.message);
+    const fromEmail =
+        process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+
+    const response = await fetch(RESEND_API_URL, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            from: `${APP_NAME} <${fromEmail}>`,
+            to: [to],
+            subject,
+            html,
+            text
+        })
     });
 
+    const result = await response.json();
 
-// ========================================
-// SEND EMAIL VERIFICATION CODE
-// ========================================
+    if (!response.ok) {
+        console.error('NEXA Resend API error:', result);
+
+        throw new Error(
+            result.message || `Email sending failed with status ${response.status}.`
+        );
+    }
+
+    console.log('NEXA email accepted by Resend:', result.id);
+
+    return result;
+}
+
+// Send the six-digit email verification code.
 async function sendVerificationEmail(email, code) {
-    const mailOptions = {
-        from: `"NEXA" <${process.env.SMTP_USER}>`,
-        to: email,
-        subject: 'Verify Your NEXA Account',
-        text: `
-Welcome to NEXA!
+    const subject = 'Verify your NEXA account';
 
-Your email verification code is: ${code}
+    const text = [
+        'Welcome to NEXA!',
+        '',
+        `Your verification code is: ${code}`,
+        '',
+        'This code expires in 10 minutes.',
+        'If you did not create this account, you can ignore this email.'
+    ].join('\n');
 
-Enter this code on the NEXA registration page to verify your account.
-
-If you did not create a NEXA account, you can ignore this email.
-        `,
-        html: `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:25px;border:1px solid #ddd;border-radius:12px;">
-                <h1 style="color:#1769ff;text-align:center;">NEXA</h1>
-
-                <h2>Verify Your Account</h2>
-
-                <p>Welcome to NEXA! Use the verification code below to verify your email address.</p>
-
-                <div style="background:#f0f5ff;padding:20px;text-align:center;border-radius:8px;">
-                    <h1 style="letter-spacing:8px;color:#1769ff;">${code}</h1>
+    const html = `
+        <div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;padding:24px;color:#222">
+            <h1 style="color:#2563eb">NEXA</h1>
+            <h2>Verify your email address</h2>
+            <p>Welcome to NEXA! Enter the code below to verify your account.</p>
+            <div style="background:#f1f5f9;padding:20px;text-align:center;border-radius:10px">
+                <div style="font-size:32px;font-weight:bold;letter-spacing:8px">
+                    ${code}
                 </div>
-
-                <p>If you did not create a NEXA account, you can ignore this email.</p>
-
-                <p style="color:#777;font-size:12px;">NEXA — Connect. Chat. Share.</p>
             </div>
-        `
-    };
+            <p>This code expires in <strong>10 minutes</strong>.</p>
+            <p>If you did not create this account, you can ignore this email.</p>
+        </div>
+    `;
 
-    return transporter.sendMail(mailOptions);
+    return sendEmail({
+        to: email,
+        subject,
+        html,
+        text
+    });
 }
 
-
-// ========================================
-// SEND PASSWORD RESET EMAIL
-// ========================================
+// Send the password-reset link.
 async function sendPasswordResetEmail(email, resetUrl) {
-    const mailOptions = {
-        from: `"NEXA" <${process.env.SMTP_USER}>`,
+    const subject = 'Reset your NEXA password';
+
+    const text = [
+        'You requested a password reset for your NEXA account.',
+        '',
+        `Reset your password using this link: ${resetUrl}`,
+        '',
+        'This link expires in 15 minutes.',
+        'If you did not request a password reset, ignore this email.'
+    ].join('\n');
+
+    const html = `
+        <div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;padding:24px;color:#222">
+            <h1 style="color:#2563eb">NEXA</h1>
+            <h2>Reset your password</h2>
+            <p>You requested a password reset for your NEXA account.</p>
+            <p>
+                <a href="${resetUrl}"
+                   style="display:inline-block;background:#2563eb;color:#fff;padding:12px 22px;text-decoration:none;border-radius:6px">
+                    Reset Password
+                </a>
+            </p>
+            <p>This link expires in <strong>15 minutes</strong>.</p>
+            <p>If you did not request this, you can ignore this email.</p>
+        </div>
+    `;
+
+    return sendEmail({
         to: email,
-        subject: 'Reset Your NEXA Password',
-
-        text: `
-You requested to reset your NEXA password.
-
-Open the following link to create a new password:
-
-${resetUrl}
-
-This link expires in 15 minutes.
-
-If you did not request a password reset, ignore this email.
-        `,
-
-        html: `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:25px;border:1px solid #ddd;border-radius:12px;">
-                <h1 style="color:#1769ff;text-align:center;">NEXA</h1>
-
-                <h2>Reset Your Password</h2>
-
-                <p>We received a request to reset your NEXA account password.</p>
-
-                <p>Click the button below to choose a new password.</p>
-
-                <div style="text-align:center;margin:30px 0;">
-                    <a href="${resetUrl}"
-                       style="background:#1769ff;color:white;padding:14px 25px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold;">
-                        Reset Password
-                    </a>
-                </div>
-
-                <p>This link expires in <strong>15 minutes</strong>.</p>
-
-                <p>If you did not request a password reset, you can safely ignore this email.</p>
-
-                <p style="color:#777;font-size:12px;">NEXA — Connect. Chat. Share.</p>
-            </div>
-        `
-    };
-
-    return transporter.sendMail(mailOptions);
+        subject,
+        html,
+        text
+    });
 }
 
-
-// ========================================
-// EXPORT FUNCTIONS
-// ========================================
 module.exports = {
-    transporter,
     sendVerificationEmail,
     sendPasswordResetEmail
 };
